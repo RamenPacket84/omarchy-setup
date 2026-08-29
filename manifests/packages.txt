@@ -2,6 +2,7 @@
 # Installed with `omarchy pkg add`. No AUR names.
 htop
 neovim
+cursor-bin
 github-cli
 wget
 rsync

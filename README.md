@@ -15,7 +15,7 @@ After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/s
 |---|---|
 | Browser | Installs Brave Origin (the only AUR package) and makes it default |
 | Terminal | Installs Ghostty, makes it default, keeps the Omarchy theme include, sets opacity `0.60` |
-| Editor | Installs Neovim and makes it the default editor |
+| Editor | Installs Neovim as the default editor, and installs Cursor |
 | Agent | Installs Grok with mise and sets it as the default agent without launching a session |
 | Font | Sets JetBrainsMono Nerd Font |
 | 1Password | Installs the app only; sign-in is manual |
@@ -28,6 +28,6 @@ After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/s
 | Idle | Lock and screensaver after 90 minutes |
 | Clock | 12-hour clock on the right of the bar |
 | Git | Sets aliases `co`/`br`/`ci`/`st`, `pull.rebase`, and `init.defaultBranch=main`. Prompts for name/email, or uses `GIT_USER_NAME` / `GIT_USER_EMAIL` |
-| Extra CLI | `htop`, `neovim`, `github-cli`, `wget`, `rsync`, `jq` |
+| Extra CLI | `htop`, `neovim`, `cursor-bin`, `github-cli`, `wget`, `rsync`, `jq` |
 
 **`--with extras`** also installs the native Discord client, Ollama, and [Retro 82](https://github.com/OldJobobo/omarchy-retro-82-theme).
