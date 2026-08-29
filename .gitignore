@@ -1,0 +1,3 @@
+*.bak.*
+setup.log
+.DS_Store

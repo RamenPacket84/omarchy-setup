@@ -1,0 +1,6 @@
+https://github.com/bjarneo/omarchy-ash-theme
+https://github.com/HANCORE-linux/omarchy-blackgold-theme.git
+https://github.com/HANCORE-linux/omarchy-blackturq-theme.git
+https://github.com/OldJobobo/omarchy-florida-man-theme
+https://github.com/monoooki/omarchy-neo-sploosh-theme
+https://github.com/OldJobobo/omarchy-retro-82-theme

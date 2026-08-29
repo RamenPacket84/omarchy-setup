@@ -1,0 +1,8 @@
+# Extra packages from official extra / omarchy / multilib.
+# Installed with `omarchy pkg add`. No AUR names.
+htop
+neovim
+github-cli
+wget
+rsync
+jq

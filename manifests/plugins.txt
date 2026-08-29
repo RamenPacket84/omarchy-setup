@@ -1,0 +1,3 @@
+https://github.com/RamenPacket84/canon.git|andrewbacon.canon
+https://github.com/RamenPacket84/DayNight.git|andrewbacon.daynight
+https://github.com/RamenPacket84/omarchy-escalock.git|andrewbacon.escalock

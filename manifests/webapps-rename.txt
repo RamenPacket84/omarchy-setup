@@ -1,0 +1,2 @@
+# filename without .desktop | display Name
+Discord|Discord (Web)

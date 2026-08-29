@@ -1,0 +1,6 @@
+{
+  "idle": {
+    "lock": 5400,
+    "screensaver": 5400
+  }
+}
