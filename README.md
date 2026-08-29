@@ -1,5 +1,5 @@
 ```bash
-git clone https://github.com/GITHUB_USER/omarchy-setup.git ~/Development/omarchy-setup && ~/Development/omarchy-setup/setup.sh
+git clone https://github.com/RamenPacket84/omarchy-setup.git ~/Development/omarchy-setup && ~/Development/omarchy-setup/setup.sh
 ```
 
 ```bash
