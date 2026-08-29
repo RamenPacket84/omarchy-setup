@@ -13,8 +13,6 @@ source "$ROOT/lib/log.sh"
 source "$ROOT/lib/omarchy.sh"
 # shellcheck source=lib/files.sh
 source "$ROOT/lib/files.sh"
-# shellcheck source=modules/steam.sh
-source "$ROOT/modules/steam.sh"
 # shellcheck source=modules/discord-native.sh
 source "$ROOT/modules/discord-native.sh"
 # shellcheck source=modules/ollama.sh
@@ -29,7 +27,7 @@ Usage: ./setup.sh [--dry-run] [--with extras]
 Replay a personal Omarchy 4 setup after a fresh install.
 
   --dry-run       Print actions without changing the system
-  --with extras   Also install Steam, native Discord, Ollama, extra themes
+  --with extras   Also install native Discord, Ollama, and Retro 82
 
 Environment:
   GIT_USER_NAME   Git user.name if git identity is unset
@@ -316,7 +314,6 @@ phase_git() {
 phase_extras() {
   (( WITH_EXTRAS )) || return 0
   log "== extras"
-  install_steam
   install_discord_native
   install_ollama
   install_extra_themes

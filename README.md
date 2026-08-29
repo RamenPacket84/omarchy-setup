@@ -29,4 +29,4 @@ After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/s
 | Git | Sets aliases `co`/`br`/`ci`/`st`, `pull.rebase`, and `init.defaultBranch=main`. Prompts for name/email, or uses `GIT_USER_NAME` / `GIT_USER_EMAIL` |
 | Extra CLI | `htop`, `neovim`, `github-cli`, `wget`, `rsync`, `jq` |
 
-**`--with extras`** also installs Steam, the native Discord client, Ollama, and extra themes (Ash, Blackgold, Blackturq, Florida Man, Neo Sploosh, Retro 82).
+**`--with extras`** also installs the native Discord client, Ollama, and [Retro 82](https://github.com/OldJobobo/omarchy-retro-82-theme).
