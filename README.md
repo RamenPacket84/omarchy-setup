@@ -28,7 +28,7 @@ Safe to re-run. Logs go to `~/.local/state/omarchy-setup/setup.log`.
 |---|---|
 | Browser | Brave Origin (default). This is the **only AUR** package. |
 | Terminal | Ghostty (default), Omarchy theme include plus opacity `0.60` |
-| Editor | VS Code (default) |
+| Editor | Neovim (default) |
 | Agent | Grok, via mise, without launching a session |
 | Font | JetBrainsMono Nerd Font |
 | Password manager | 1Password app only (sign-in is manual) |
@@ -45,7 +45,7 @@ Safe to re-run. Logs go to `~/.local/state/omarchy-setup/setup.log`.
 
 ## What it does not do
 
-- No Thunderbird, Minecraft, Windows VM, fingerprint, or shader pack
+- No Thunderbird, Minecraft, VS Code, Windows VM, fingerprint, or shader pack
 - No AUR except Brave Origin (`omarchy install browser brave-origin`)
 - No SSH keys, API tokens, browser profiles, 1Password account data, or git email in the repo
 - Does not apply monitor scale (this laptop uses `1.25`; set that in `~/.config/hypr/monitors.lua` if you want it)

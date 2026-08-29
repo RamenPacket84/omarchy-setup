@@ -92,13 +92,11 @@ phase_defaults() {
     run omarchy install terminal ghostty
   fi
 
-  if pkg_present visual-studio-code-bin; then
-    log "VS Code already installed"
+  pkg_add neovim
+  if [[ $(omarchy default editor 2>/dev/null || true) != nvim ]]; then
+    run omarchy default editor nvim
   else
-    run omarchy install editor vscode
-  fi
-  if [[ $(omarchy default editor 2>/dev/null || true) != code ]]; then
-    run omarchy default editor code
+    log "default editor already nvim"
   fi
 
   local font
@@ -346,7 +344,7 @@ phase_verify() {
 
   check browser "$(omarchy default browser 2>/dev/null || true)" brave-origin
   check terminal "$(omarchy default terminal 2>/dev/null || true)" ghostty
-  check editor "$(omarchy default editor 2>/dev/null || true)" code
+  check editor "$(omarchy default editor 2>/dev/null || true)" nvim
   check agent "$(cat "$HOME/.config/omarchy/defaults/agent" 2>/dev/null || true)" grok
   check theme "$(omarchy theme current 2>/dev/null || true)" "Last Call"
   check gaps_in "$(hyprctl getoption general:gaps_in 2>/dev/null | head -1 || true)" "3 3 3 3"
