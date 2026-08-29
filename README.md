@@ -7,7 +7,7 @@ git clone https://github.com/GITHUB_USER/omarchy-setup.git ~/Development/omarchy
 ~/Development/omarchy-setup/setup.sh --dry-run
 ```
 
-After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. It does not install Omarchy itself and does not copy secrets. Logs: `~/.local/state/omarchy-setup/setup.log`.
+After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/state/omarchy-setup/setup.log`.
 
 **Core run**
 
@@ -26,9 +26,7 @@ After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. It does not insta
 | Plugins | Installs [Canon](https://github.com/RamenPacket84/canon), [DayNight](https://github.com/RamenPacket84/DayNight), and [EscaLock](https://github.com/RamenPacket84/omarchy-escalock) on the right of the bar. EscaLock may open a guided sudo/Polkit setup on first install |
 | Idle | Lock and screensaver after 90 minutes |
 | Clock | 12-hour clock on the right of the bar |
-| Git | Sets aliases `co`/`br`/`ci`/`st`, `pull.rebase`, and `init.defaultBranch=main`. Prompts for name/email (or uses `GIT_USER_NAME` / `GIT_USER_EMAIL`); those values are not stored in this repo |
+| Git | Sets aliases `co`/`br`/`ci`/`st`, `pull.rebase`, and `init.defaultBranch=main`. Prompts for name/email, or uses `GIT_USER_NAME` / `GIT_USER_EMAIL` |
 | Extra CLI | `htop`, `neovim`, `github-cli`, `wget`, `rsync`, `jq` |
 
-**`--with extras`** also installs Steam, the native Discord client, Ollama (no models), and extra themes (Ash, Blackgold, Blackturq, Florida Man, Neo Sploosh, Retro 82).
-
-It does not install Thunderbird, Minecraft, VS Code, a Windows VM, fingerprint auth, or the shader pack. It does not apply monitor scale. `omarchy refresh applications` resets the Discord web app name; re-run `setup.sh` to restore **Discord (Web)**.
+**`--with extras`** also installs Steam, the native Discord client, Ollama, and extra themes (Ash, Blackgold, Blackturq, Florida Man, Neo Sploosh, Retro 82).
