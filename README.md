@@ -21,6 +21,7 @@ After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/s
 | 1Password | Installs the app only; sign-in is manual |
 | Theme | Installs and applies [Last Call](https://github.com/OldJobobo/omarchy-last-call-theme) |
 | Gaps | `gaps_in = 3`, `gaps_out = 6` |
+| Keys | Super+F file manager, Super+B default browser, Super+X X, Super+Y YouTube; Super+Enter is already the default terminal |
 | Pointer | Laptop sensitivity `0`, external display `-0.8` |
 | Web apps | Removes HEY, WhatsApp, and Zoom; names the Discord web app **Discord (Web)** |
 | Plugins | Installs [Canon](https://github.com/RamenPacket84/canon), [DayNight](https://github.com/RamenPacket84/DayNight), and [EscaLock](https://github.com/RamenPacket84/omarchy-escalock) on the right of the bar. EscaLock may open a guided sudo/Polkit setup on first install |

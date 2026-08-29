@@ -203,6 +203,7 @@ phase_hyprland() {
   log "== hyprland"
   install_file "$ROOT/snippets/hypr/looknfeel.lua" "$HOME/.config/hypr/looknfeel.lua"
   install_file "$ROOT/snippets/hypr/input.lua" "$HOME/.config/hypr/input.lua"
+  install_file "$ROOT/snippets/hypr/bindings.lua" "$HOME/.config/hypr/bindings.lua"
   install_file "$ROOT/snippets/hypr/autostart.lua" "$HOME/.config/hypr/autostart.lua"
   install_file "$ROOT/snippets/hypr/scripts/pointer-sensitivity-by-monitor.sh" \
     "$HOME/.config/hypr/scripts/pointer-sensitivity-by-monitor.sh" 0755
