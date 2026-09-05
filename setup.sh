@@ -254,6 +254,8 @@ phase_ghostty() {
 
 phase_theme() {
   log "== theme"
+  install_themes_from_manifest "$ROOT/manifests/themes-available.txt"
+
   local themes=()
   mapfile -t themes < <(manifest_lines "$ROOT/manifests/themes.txt")
   ((${#themes[@]})) || die "manifests/themes.txt has no theme slug"
@@ -266,6 +268,21 @@ phase_theme() {
   else
     run omarchy theme set "$slug"
   fi
+}
+
+phase_fastfetch() {
+  log "== fastfetch"
+  local src="$HOME/.config/omarchy/themes/terminal-outpost-labs/fastfetch"
+  local dest="$HOME/.config/fastfetch"
+  if [[ ! -f $src/config.jsonc ]]; then
+    if (( DRY_RUN )); then
+      log "DRY: install fastfetch from $src"
+      return 0
+    fi
+    die "missing $src/config.jsonc (install terminal-outpost-labs first)"
+  fi
+  install_file "$src/config.jsonc" "$dest/config.jsonc"
+  install_file "$src/terminal-outpost-labs.txt" "$dest/terminal-outpost-labs.txt"
 }
 
 phase_plugins() {
@@ -406,6 +423,23 @@ phase_verify() {
       fail=1
     fi
   done < <(manifest_lines "$ROOT/manifests/plugins.txt")
+  local theme_url theme_name
+  while IFS= read -r theme_url; do
+    theme_name="$(theme_name_from_url "$theme_url")"
+    if [[ ! -d $HOME/.config/omarchy/themes/$theme_name ]]; then
+      warn "fail theme $theme_name missing"
+      fail=1
+    fi
+  done < <(manifest_lines "$ROOT/manifests/themes-available.txt")
+  if [[ ! -f $HOME/.config/fastfetch/config.jsonc ]] ||
+    ! grep -Fq 'terminal-outpost-labs.txt' "$HOME/.config/fastfetch/config.jsonc"; then
+    warn "fail fastfetch config is not Terminal Outpost Labs"
+    fail=1
+  fi
+  if [[ ! -f $HOME/.config/fastfetch/terminal-outpost-labs.txt ]]; then
+    warn "fail fastfetch logo missing"
+    fail=1
+  fi
 
   if (( fail )); then
     warn "setup finished with verification warnings"
@@ -425,6 +459,7 @@ main() {
   phase_hyprland
   phase_ghostty
   phase_theme
+  phase_fastfetch
   phase_plugins
   phase_git
   phase_extras

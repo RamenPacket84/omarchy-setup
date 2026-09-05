@@ -1,0 +1,3 @@
+# Git theme repos to clone into ~/.config/omarchy/themes without applying.
+# Default theme stays whatever manifests/themes.txt names.
+https://github.com/RamenPacket84/terminal-outpost-labs.git

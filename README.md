@@ -19,7 +19,8 @@ After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/s
 | Agent | Installs Grok with mise and sets it as the default agent without launching a session |
 | Font | Sets JetBrainsMono Nerd Font |
 | 1Password | Installs the app only; sign-in is manual |
-| Theme | Sets the stock Everforest theme |
+| Theme | Sets the stock Everforest theme. Also clones [Terminal Outpost Labs](https://github.com/RamenPacket84/terminal-outpost-labs) without applying it |
+| Fastfetch | Applies the Terminal Outpost Labs logo and layout |
 | Gaps | `gaps_in = 3`, `gaps_out = 6` |
 | Keys | Super+F file manager, Super+B default browser, Super+X X, Super+Y YouTube; Super+Enter is already the default terminal |
 | Pointer | Laptop sensitivity `0`, external display `-0.8` (needs `socat`) |
