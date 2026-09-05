@@ -114,26 +114,33 @@ phase_defaults() {
 
 phase_webapps() {
   log "== web apps"
-  local name desktop
+  local name desktop file display comment need
   while IFS= read -r name; do
-    [[ -z $name || $name == \#* ]] && continue
     desktop="$HOME/.local/share/applications/${name}.desktop"
     if [[ -f $desktop ]]; then
-      OMARCHY_REMOVE_NOTIFY=false run omarchy-webapp-remove "$name"
+      OMARCHY_REMOVE_NOTIFY=false run omarchy webapp remove "$name"
     else
       log "web app already absent: $name"
     fi
-  done <"$ROOT/manifests/webapps-remove.txt"
+  done < <(manifest_lines "$ROOT/manifests/webapps-remove.txt")
 
-  local file display
-  while IFS='|' read -r file display; do
-    [[ -z $file || $file == \#* ]] && continue
+  install_file "$ROOT/manifests/webapps-remove.txt" \
+    "$HOME/.local/state/omarchy-setup/webapps-remove.txt"
+  install_file "$ROOT/snippets/omarchy/hooks/omarchy-setup-remove-webapps.sh" \
+    "$HOME/.config/omarchy/hooks/post-update.d/omarchy-setup-remove-webapps.sh" 0755
+
+  while IFS='|' read -r file display comment; do
     desktop="$HOME/.local/share/applications/${file}.desktop"
     if [[ ! -f $desktop ]]; then
       log "launcher missing, skip rename: $file"
       continue
     fi
-    if grep -q "^Name=${display}$" "$desktop"; then
+    need=0
+    grep -Fx "Name=${display}" "$desktop" >/dev/null || need=1
+    if [[ -n ${comment:-} ]] && ! grep -Fx "Comment=${comment}" "$desktop" >/dev/null; then
+      need=1
+    fi
+    if (( ! need )); then
       log "already named ${display}: $file"
       continue
     fi
@@ -142,12 +149,16 @@ phase_webapps() {
       log "DRY: Name=$display in $desktop"
       continue
     fi
-    sed -i "s/^Name=.*/Name=${display}/" "$desktop"
-    if ! grep -q '^Comment=' "$desktop"; then
-      sed -i "/^Name=/a Comment=Discord in the browser" "$desktop"
+    sed -i "s|^Name=.*|Name=${display}|" "$desktop"
+    if [[ -n ${comment:-} ]]; then
+      if grep -q '^Comment=' "$desktop"; then
+        sed -i "s|^Comment=.*|Comment=${comment}|" "$desktop"
+      else
+        sed -i "/^Name=/a Comment=${comment}" "$desktop"
+      fi
     fi
     log "renamed $file -> $display"
-  done <"$ROOT/manifests/webapps-rename.txt"
+  done < <(manifest_lines "$ROOT/manifests/webapps-rename.txt")
   if (( ! DRY_RUN )); then
     update-desktop-database "$HOME/.local/share/applications" >/dev/null 2>&1 || true
     omarchy menu refresh >/dev/null 2>&1 || true
@@ -157,11 +168,7 @@ phase_webapps() {
 phase_packages() {
   log "== packages"
   local pkgs=()
-  local line
-  while IFS= read -r line; do
-    [[ -z $line || $line == \#* ]] && continue
-    pkgs+=("$line")
-  done <"$ROOT/manifests/packages.txt"
+  mapfile -t pkgs < <(manifest_lines "$ROOT/manifests/packages.txt")
   pkg_add "${pkgs[@]}"
 }
 
@@ -172,35 +179,34 @@ phase_mise() {
     return 0
   }
   install_if_missing "$ROOT/snippets/mise/config.toml" "$HOME/.config/mise/config.toml"
-  if (( DRY_RUN )); then
-    log "DRY: mise install"
-    return 0
-  fi
   # Do not overwrite an existing user mise config; still ensure tools.
   local tool
-  for tool in python gh opencode codex "npm:@xai-official/grok"; do
-    if mise where "$tool" >/dev/null 2>&1; then
-      log "mise tool present: $tool"
-    else
-      run mise use -g "${tool}@latest"
-    fi
-  done
+  if (( DRY_RUN )); then
+    log "DRY: mise install"
+  else
+    for tool in python opencode codex "npm:@xai-official/grok"; do
+      if mise where "$tool" >/dev/null 2>&1; then
+        log "mise tool present: $tool"
+      else
+        run mise use -g "${tool}@latest"
+      fi
+    done
+  fi
 
-  mkdir -p "$HOME/.config/omarchy/defaults"
   if [[ $(cat "$HOME/.config/omarchy/defaults/agent" 2>/dev/null || true) == grok ]]; then
     log "default agent already grok"
+  elif (( DRY_RUN )); then
+    log "DRY: write default agent grok"
   else
-    if (( DRY_RUN )); then
-      log "DRY: write default agent grok"
-    else
-      printf 'grok\n' >"$HOME/.config/omarchy/defaults/agent"
-      log "set default agent to grok (without launching it)"
-    fi
+    mkdir -p "$HOME/.config/omarchy/defaults"
+    printf 'grok\n' >"$HOME/.config/omarchy/defaults/agent"
+    log "set default agent to grok (without launching it)"
   fi
 }
 
 phase_hyprland() {
   log "== hyprland"
+  INSTALL_FILE_CHANGED=0
   install_file "$ROOT/snippets/hypr/looknfeel.lua" "$HOME/.config/hypr/looknfeel.lua"
   install_file "$ROOT/snippets/hypr/input.lua" "$HOME/.config/hypr/input.lua"
   install_file "$ROOT/snippets/hypr/bindings.lua" "$HOME/.config/hypr/bindings.lua"
@@ -208,10 +214,22 @@ phase_hyprland() {
   install_file "$ROOT/snippets/hypr/scripts/pointer-sensitivity-by-monitor.sh" \
     "$HOME/.config/hypr/scripts/pointer-sensitivity-by-monitor.sh" 0755
   if (( DRY_RUN )); then
-    log "DRY: hyprctl reload"
+    if (( INSTALL_FILE_CHANGED )); then
+      log "DRY: hyprctl reload"
+    else
+      log "hyprland configs unchanged; skip reload"
+    fi
     return 0
   fi
-  hyprctl reload
+  if ! in_hyprland; then
+    warn "Hyprland session not available; skip reload (configs written)"
+    return 0
+  fi
+  if (( ! INSTALL_FILE_CHANGED )); then
+    log "hyprland configs unchanged; skip reload"
+    return 0
+  fi
+  run hyprctl reload
   local errors
   errors="$(hyprctl configerrors || true)"
   if [[ -n $errors && $errors != ok ]]; then
@@ -231,23 +249,22 @@ phase_ghostty() {
     warn "Ghostty config is missing Omarchy theme include; restoring stock defaults then applying overrides"
     install_file "$stock" "$dest"
   fi
-  ensure_managed_block "$dest" "# managed-by: omarchy-setup" "$(cat "$ROOT/snippets/ghostty/overrides.conf" | grep -v '^# managed-by')"
+  ensure_managed_block "$dest" "# managed-by: omarchy-setup" "$(<"$ROOT/snippets/ghostty/overrides.conf")"
 }
 
 phase_theme() {
   log "== theme"
-  local url dest
-  url="$(grep -v '^#' "$ROOT/manifests/themes.txt" | grep -v '^$' | head -1)"
-  dest="$HOME/.config/omarchy/themes/last-call"
-  if [[ -d $dest ]]; then
-    log "theme already installed: last-call"
+  local themes=()
+  mapfile -t themes < <(manifest_lines "$ROOT/manifests/themes.txt")
+  ((${#themes[@]})) || die "manifests/themes.txt has no theme slug"
+  local slug="${themes[0]}"
+  local current current_slug
+  current="$(omarchy theme current 2>/dev/null || true)"
+  current_slug="$(theme_slug "$current")"
+  if [[ $current_slug == "$slug" ]]; then
+    log "theme already $current"
   else
-    run omarchy theme install "$url"
-  fi
-  if [[ $(omarchy theme current 2>/dev/null || true) == "Last Call" ]]; then
-    log "theme already Last Call"
-  else
-    run omarchy theme set last-call
+    run omarchy theme set "$slug"
   fi
 }
 
@@ -255,7 +272,6 @@ phase_plugins() {
   log "== plugins"
   local url id dest
   while IFS='|' read -r url id; do
-    [[ -z $url || $url == \#* ]] && continue
     dest="$HOME/.config/omarchy/plugins/$id"
     if [[ -d $dest ]]; then
       log "plugin already installed: $id"
@@ -263,7 +279,7 @@ phase_plugins() {
       run omarchy plugin add "$url" --enable --yes
     fi
     run omarchy bar move "$id" --section right
-  done <"$ROOT/manifests/plugins.txt"
+  done < <(manifest_lines "$ROOT/manifests/plugins.txt")
 
   run omarchy bar move omarchy.clock --section right
   run omarchy bar set omarchy.clock format "dddd h:mm AP"
@@ -276,17 +292,26 @@ phase_plugins() {
 
 phase_git() {
   log "== git"
+  local dest="$HOME/.config/git/omarchy-setup.gitconfig"
+  install_file "$ROOT/snippets/git/aliases.gitconfig" "$dest"
   if (( DRY_RUN )); then
-    log "DRY: git config aliases and identity"
+    log "DRY: git config include.path $dest"
+    log "DRY: git identity"
     return 0
   fi
-  git config --global alias.co checkout
-  git config --global alias.br branch
-  git config --global alias.ci commit
-  git config --global alias.st status
-  git config --global pull.rebase true
-  git config --global init.defaultBranch main
-  log "git aliases and pull.rebase applied"
+  local p found=0
+  while IFS= read -r p; do
+    if [[ $p == "$dest" ]]; then
+      found=1
+      break
+    fi
+  done < <(git config --global --get-all include.path 2>/dev/null || true)
+  if (( found )); then
+    log "git include.path already $dest"
+  else
+    git config --global --add include.path "$dest"
+    log "git include.path += $dest"
+  fi
 
   local name email
   name="$(git config --global user.name || true)"
@@ -340,40 +365,47 @@ phase_verify() {
     return 0
   fi
 
+  local themes=()
+  mapfile -t themes < <(manifest_lines "$ROOT/manifests/themes.txt")
+  local want_theme="${themes[0]:-}"
+  local got_theme
+  got_theme="$(theme_slug "$(omarchy theme current 2>/dev/null || true)")"
+
   check browser "$(omarchy default browser 2>/dev/null || true)" brave-origin
   check terminal "$(omarchy default terminal 2>/dev/null || true)" ghostty
   check editor "$(omarchy default editor 2>/dev/null || true)" nvim
   check agent "$(cat "$HOME/.config/omarchy/defaults/agent" 2>/dev/null || true)" grok
-  check theme "$(omarchy theme current 2>/dev/null || true)" "Last Call"
-  check gaps_in "$(hyprctl getoption general:gaps_in 2>/dev/null | head -1 || true)" "3 3 3 3"
-  check gaps_out "$(hyprctl getoption general:gaps_out 2>/dev/null | head -1 || true)" "6 6 6 6"
-  [[ ! -f $HOME/.local/share/applications/HEY.desktop ]] || {
-    warn "fail HEY.desktop still present"
-    fail=1
-  }
-  [[ ! -f $HOME/.local/share/applications/WhatsApp.desktop ]] || {
-    warn "fail WhatsApp.desktop still present"
-    fail=1
-  }
-  [[ ! -f $HOME/.local/share/applications/Zoom.desktop ]] || {
-    warn "fail Zoom.desktop still present"
-    fail=1
-  }
-  if [[ -f $HOME/.local/share/applications/Discord.desktop ]]; then
-    check discord-web-name "$(grep '^Name=' "$HOME/.local/share/applications/Discord.desktop")" "Discord (Web)"
+  check theme "$got_theme" "$want_theme"
+  if in_hyprland; then
+    local gaps_in gaps_out
+    gaps_in="$(hyprctl getoption general:gaps_in 2>/dev/null || true)"
+    gaps_out="$(hyprctl getoption general:gaps_out 2>/dev/null || true)"
+    check gaps_in "${gaps_in%%$'\n'*}" "3 3 3 3"
+    check gaps_out "${gaps_out%%$'\n'*}" "6 6 6 6"
+  else
+    warn "skip hyprland verify (no session)"
   fi
-  [[ -d $HOME/.config/omarchy/plugins/andrewbacon.canon ]] || {
-    warn "fail plugin canon missing"
-    fail=1
-  }
-  [[ -d $HOME/.config/omarchy/plugins/andrewbacon.daynight ]] || {
-    warn "fail plugin daynight missing"
-    fail=1
-  }
-  [[ -d $HOME/.config/omarchy/plugins/andrewbacon.escalock ]] || {
-    warn "fail plugin escalock missing"
-    fail=1
-  }
+  local name file display comment url id
+  while IFS= read -r name; do
+    if [[ -f $HOME/.local/share/applications/${name}.desktop ]]; then
+      warn "fail ${name}.desktop still present"
+      fail=1
+    fi
+  done < <(manifest_lines "$ROOT/manifests/webapps-remove.txt")
+  while IFS='|' read -r file display comment; do
+    if [[ -f $HOME/.local/share/applications/${file}.desktop ]]; then
+      check "${file}-name" "$(grep '^Name=' "$HOME/.local/share/applications/${file}.desktop" || true)" "$display"
+      if [[ -n ${comment:-} ]]; then
+        check "${file}-comment" "$(grep '^Comment=' "$HOME/.local/share/applications/${file}.desktop" || true)" "$comment"
+      fi
+    fi
+  done < <(manifest_lines "$ROOT/manifests/webapps-rename.txt")
+  while IFS='|' read -r url id; do
+    if [[ ! -d $HOME/.config/omarchy/plugins/$id ]]; then
+      warn "fail plugin $id missing"
+      fail=1
+    fi
+  done < <(manifest_lines "$ROOT/manifests/plugins.txt")
 
   if (( fail )); then
     warn "setup finished with verification warnings"
@@ -384,6 +416,7 @@ phase_verify() {
 
 main() {
   parse_args "$@"
+  trap 'die "failed at line $LINENO: $BASH_COMMAND (exit $?)"' ERR
   phase_preflight
   phase_defaults
   phase_webapps

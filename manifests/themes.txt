@@ -1,1 +1,2 @@
-https://github.com/OldJobobo/omarchy-last-call-theme
+# Stock Omarchy theme slug. Applied with `omarchy theme set`; not cloned.
+everforest

@@ -10,7 +10,6 @@ theme_name_from_url() {
 install_extra_themes() {
   local url name dest
   while IFS= read -r url; do
-    [[ -z $url || $url == \#* ]] && continue
     name="$(theme_name_from_url "$url")"
     dest="$HOME/.config/omarchy/themes/$name"
     if [[ -d $dest ]]; then
@@ -18,5 +17,5 @@ install_extra_themes() {
       continue
     fi
     run omarchy theme install "$url"
-  done <"$ROOT/manifests/themes-extra.txt"
+  done < <(manifest_lines "$ROOT/manifests/themes-extra.txt")
 }

@@ -7,7 +7,7 @@ git clone https://github.com/RamenPacket84/omarchy-setup.git ~/Development/omarc
 ~/Development/omarchy-setup/setup.sh --dry-run
 ```
 
-After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/state/omarchy-setup/setup.log`.
+After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/state/omarchy-setup/setup.log`. Replaced files are copied to `~/.local/state/omarchy-setup/backups/` (not next to the live file). Re-running setup overwrites the Hyprland snippets under `~/.config/hypr/` when they differ from this repo.
 
 **Core run**
 
@@ -19,15 +19,15 @@ After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/s
 | Agent | Installs Grok with mise and sets it as the default agent without launching a session |
 | Font | Sets JetBrainsMono Nerd Font |
 | 1Password | Installs the app only; sign-in is manual |
-| Theme | Installs and applies [Last Call](https://github.com/OldJobobo/omarchy-last-call-theme) |
+| Theme | Sets the stock Everforest theme |
 | Gaps | `gaps_in = 3`, `gaps_out = 6` |
 | Keys | Super+F file manager, Super+B default browser, Super+X X, Super+Y YouTube; Super+Enter is already the default terminal |
-| Pointer | Laptop sensitivity `0`, external display `-0.8` |
-| Web apps | Removes HEY, WhatsApp, and Zoom; names the Discord web app **Discord (Web)** |
+| Pointer | Laptop sensitivity `0`, external display `-0.8` (needs `socat`) |
+| Web apps | Removes HEY, WhatsApp, Zoom, and Basecamp; names the Discord web app **Discord (Web)**. A `post-update` hook re-removes them after `omarchy update` recopies stock launchers |
 | Plugins | Installs [Canon](https://github.com/RamenPacket84/canon), [DayNight](https://github.com/RamenPacket84/DayNight), and [EscaLock](https://github.com/RamenPacket84/omarchy-escalock) on the right of the bar. EscaLock may open a guided sudo/Polkit setup on first install |
 | Idle | Lock and screensaver after 90 minutes |
 | Clock | 12-hour clock on the right of the bar |
-| Git | Sets aliases `co`/`br`/`ci`/`st`, `pull.rebase`, and `init.defaultBranch=main`. Prompts for name/email, or uses `GIT_USER_NAME` / `GIT_USER_EMAIL` |
-| Extra CLI | `htop`, `neovim`, `cursor-bin`, `github-cli`, `wget`, `rsync`, `jq` |
+| Git | Includes `~/.config/git/omarchy-setup.gitconfig` (`co`/`br`/`ci`/`st`, `pull.rebase`, `init.defaultBranch=main`). Prompts for name/email, or uses `GIT_USER_NAME` / `GIT_USER_EMAIL` |
+| Extra CLI | `htop`, `cursor-bin`, `github-cli`, `wget`, `rsync`, `jq`, `socat` |
 
 **`--with extras`** also installs the native Discord client, Ollama, and [Retro 82](https://github.com/OldJobobo/omarchy-retro-82-theme).

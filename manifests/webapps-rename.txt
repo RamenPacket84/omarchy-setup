@@ -1,2 +1,2 @@
-# filename without .desktop | display Name
-Discord|Discord (Web)
+# filename without .desktop | display Name | optional Comment
+Discord|Discord (Web)|Discord in the browser

@@ -1,9 +1,11 @@
 # Extra packages from official extra / omarchy / multilib.
 # Installed with `omarchy pkg add`. No AUR names.
+# neovim is installed in phase_defaults (default editor).
+# socat: pointer-sensitivity-by-monitor.sh watches Hyprland's event socket.
 htop
-neovim
 cursor-bin
 github-cli
 wget
 rsync
 jq
+socat
