@@ -1,13 +1,17 @@
-```bash
-git clone https://github.com/RamenPacket84/omarchy-setup.git ~/Development/omarchy-setup && ~/Development/omarchy-setup/setup.sh
-```
+After a fresh [Omarchy](https://omarchy.org/) 4 install, clone this bootstrap into `~/Projects` (Omarchy's default projects directory) and run it:
 
 ```bash
-~/Development/omarchy-setup/setup.sh --with extras
-~/Development/omarchy-setup/setup.sh --dry-run
+git clone https://github.com/RamenPacket84/omarchy-setup.git ~/Projects/omarchy-setup && bash ~/Projects/omarchy-setup/setup.sh
 ```
 
-After a fresh Omarchy 4 install, `setup.sh` is safe to re-run. Logs: `~/.local/state/omarchy-setup/setup.log`. Replaced files are copied to `~/.local/state/omarchy-setup/backups/` (not next to the live file). Re-running setup overwrites the Hyprland snippets under `~/.config/hypr/` when they differ from this repo.
+`setup.sh` is safe to re-run:
+
+```bash
+~/Projects/omarchy-setup/setup.sh --with extras
+~/Projects/omarchy-setup/setup.sh --dry-run
+```
+
+Logs: `~/.local/state/omarchy-setup/setup.log`. Replaced files are copied to `~/.local/state/omarchy-setup/backups/` (not next to the live file). Re-running setup overwrites the Hyprland snippets under `~/.config/hypr/` when they differ from this repo.
 
 **Core run**
 
